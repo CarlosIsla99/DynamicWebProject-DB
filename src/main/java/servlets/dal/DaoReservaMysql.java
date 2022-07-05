@@ -11,7 +11,7 @@ class DaoReservaMysql implements DaoReserva {
 	
 	private static final String SQL_SELECT = "SELECT * FROM coches";
 	private static final String SQL_SELECT_ID = "SELECT * FROM coches WHERE id = ?";
-	private static final String SQL_INSERT = "INSERT INTO reservas (idcoche, nombre, email, fechahora, numeropersonas, comentario, usuarios_id, coches_id) VALUES (?, ?, ?, ?, ?, ?, 0, 0)";
+	private static final String SQL_INSERT = "INSERT INTO reservas (idcoche, nombre, email, fechahora, numeropersonas, comentario) VALUES (?, ?, ?, ?, ?, ?)";
 	private static final String SQL_UPDATE = "UPDATE reservas SET idcoche = ?, nombre = ?, email = ?, fechahora = ?, numeropersonas = ?, comentario = ?, usuarios_id = 0, coches_id = 0 WHERE id = ?";
 	private static final String SQL_DELETE = "DELETE FROM reservas WHERE id = ?";
 	
@@ -109,8 +109,8 @@ class DaoReservaMysql implements DaoReserva {
 			pst.setLong(1, reserva.getIdCoche());
 			pst.setString(2, reserva.getNombre());
 			pst.setString(3, reserva.getEmail());
-			pst.setString(4, (reserva.getFechaHora().toString()));
-			// pst.setTimestamp(4, Timestamp.valueOf(reserva.getFechaHora()));
+			//pst.setString(4, (reserva.getFechaHora().toString()));
+			pst.setTimestamp(4, Timestamp.valueOf(reserva.getFechaHora()));
 			pst.setInt(5, reserva.getNumeroPersonas());
 			pst.setString(6, reserva.getComentario());
 
