@@ -8,25 +8,25 @@ import java.util.Objects;
 public class Reserva {
 	
 	private Long id;
-	private Long idCoche;
 	private String nombre;
-	private String email;
 	private LocalDateTime fechaHora;
 	private Integer numeroPersonas;
 	private String comentario;
+	private Long usuarios_id;
+	private Long coches_id;
 	
 	private Map<String, String> errores = new HashMap<>();
 	
-	public Reserva(Long id, Long idCoche, String nombre, String email, LocalDateTime fechaHora, Integer numeroPersonas,
-			String comentario) {
+	public Reserva(Long id, String nombre, LocalDateTime fechaHora, Integer numeroPersonas,
+			String comentario, Long usuarios_id, Long coches_id) {
 		super();
 		setId(id);
-		setIdCoche(idCoche);
 		setNombre(nombre);
-		setEmail(email);
 		setFechaHora(fechaHora);
 		setNumeroPersonas(numeroPersonas);
 		setComentario(comentario);
+		setUsuarios_id(usuarios_id);
+		setCoches_id(coches_id);
 	}
 
 	public Long getId() {
@@ -37,14 +37,6 @@ public class Reserva {
 		this.id = id;
 	}
 
-	public Long getIdCoche() {
-		return idCoche;
-	}
-
-	public void setIdCoche(Long idCoche) {
-		this.idCoche = idCoche;
-	}
-
 	public String getNombre() {
 		return nombre;
 	}
@@ -52,27 +44,10 @@ public class Reserva {
 	public void setNombre(String nombre) {
 		
 		if (nombre == null || nombre.trim().length() < 3) {
-			errores.put("nombre", "El nombre debe tener 3 o más caracteres");
+			errores.put("nombre", "El nombre debe tener 3 o mï¿½s caracteres");
 		}
 		
 		this.nombre = nombre;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		
-		if (email == null) {
-			throw new RuntimeException("No se ha recibido el email");
-		}
-
-		if (email.trim().length() > 0 && !email.trim().matches("^\\w+@\\w+\\.\\w+$")) {
-			errores.put("email", "Debes introducir un formato de email válido");
-		}
-		
-		this.email = email;
 	}
 
 	public LocalDateTime getFechaHora() {
@@ -82,7 +57,7 @@ public class Reserva {
 	public void setFechaHora(LocalDateTime fechaHora) {
 			
 		if (fechaHora == null || fechaHora.isBefore(LocalDateTime.now()) || fechaHora.isAfter(LocalDateTime.now().plusMonths(1))) {
-			errores.put("fechaHora", "No se pueden hacer reservas en el pasado ni de más de un mes");
+			errores.put("fechaHora", "No se pueden hacer reservas en el pasado ni de mï¿½s de un mes");
 		}
 			
 		this.fechaHora = fechaHora;
@@ -109,19 +84,35 @@ public class Reserva {
 	public void setComentario(String comentario) {
 		
 		if (comentario == null) {
-			throw new RuntimeException("No se han recibido ningún comentario");
+			throw new RuntimeException("No se han recibido ningï¿½n comentario");
 		}
 		
 		this.comentario = comentario;
 	}
 	
+	public Long getUsuarios_id() {
+		return usuarios_id;
+	}
+
+	public void setUsuarios_id(Long usuarios_id) {
+		this.usuarios_id = usuarios_id;
+	}
+
+	public Long getCoches_id() {
+		return coches_id;
+	}
+
+	public void setCoches_id(Long coches_id) {
+		this.coches_id = coches_id;
+	}
+
 	public Map<String, String> getErrores() {
 		return errores;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(comentario, email, errores, fechaHora, id, idCoche, nombre, numeroPersonas);
+		return Objects.hash(coches_id, comentario, errores, fechaHora, id, nombre, numeroPersonas, usuarios_id);
 	}
 
 	@Override
@@ -133,17 +124,19 @@ public class Reserva {
 		if (getClass() != obj.getClass())
 			return false;
 		Reserva other = (Reserva) obj;
-		return Objects.equals(comentario, other.comentario) && Objects.equals(email, other.email)
+		return Objects.equals(coches_id, other.coches_id) && Objects.equals(comentario, other.comentario)
 				&& Objects.equals(errores, other.errores) && Objects.equals(fechaHora, other.fechaHora)
-				&& Objects.equals(id, other.id) && Objects.equals(idCoche, other.idCoche)
-				&& Objects.equals(nombre, other.nombre) && Objects.equals(numeroPersonas, other.numeroPersonas);
+				&& Objects.equals(id, other.id) && Objects.equals(nombre, other.nombre)
+				&& Objects.equals(numeroPersonas, other.numeroPersonas)
+				&& Objects.equals(usuarios_id, other.usuarios_id);
 	}
 
 	@Override
 	public String toString() {
-		return "Reserva [id=" + id + ", idCoche=" + idCoche + ", nombre=" + nombre + ", email=" + email + ", fechaHora="
-				+ fechaHora + ", numeroPersonas=" + numeroPersonas + ", comentario=" + comentario + ", errores="
-				+ errores + "]";
+		return "Reserva [id=" + id + ", nombre=" + nombre + ", fechaHora=" + fechaHora + ", numeroPersonas="
+				+ numeroPersonas + ", comentario=" + comentario + ", usuarios_id=" + usuarios_id + ", coches_id="
+				+ coches_id + ", errores=" + errores + "]";
 	}
+
 
 }

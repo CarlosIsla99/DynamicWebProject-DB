@@ -8,22 +8,22 @@
   <div class="form-row row justify-content-center">
     <div class="form-group col-5">
       <label for="inputEmail4">Email</label>
-      <input type="email" name="email" class="form-control" placeholder="Email" required="required">
+      <input type="email" name="email" value="${usuario.email}" class="form-control" placeholder="Email" required="required">
       <span class="text-danger">${usuario.errores.email}</span>
     </div>
     <div class="form-group col-5">
       <label for="inputPassword4">Contraseña</label>
-      <input type="password" name="contra1" class="form-control" placeholder="Contraseña" required="required">
+      <input type="password" name="contra1" value="${usuario.password}" class="form-control" placeholder="Contraseña" required="required">
       <span class="text-danger">${usuario.errores.password}</span>
     </div>
     <div class="form-group col-5">
       <label for="inputPassword4">Confirmar Contraseña</label>
-      <input type="password" name="contra2" class="form-control" placeholder="Confirmar Contraseña" required="required">
+      <input type="password" name="contra2" value="${usuario.password}" class="form-control" placeholder="Confirmar Contraseña" required="required">
 	  <span class="text-danger">${error}</span>
     </div>
     <div class="form-group col-5">
     	<label for="inputAddress">Teléfono</label>
-    	<input type="text" name="tel" class="form-control" placeholder="Teléfono" required="required">
+    	<input type="text" name="tel" value="${usuario.telefono}" class="form-control" placeholder="Teléfono" required="required">
     	<span class="text-danger">${usuario.errores.telefono}</span>
   	</div>
   </div>

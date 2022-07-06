@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import servlets.modelos.Reserva;
+import servlets.modelos.Usuario;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -47,7 +48,10 @@ public class ReservaFormServlet extends HttpServlet {
 		String id = request.getParameter("id");
 		Long idCoche = Long.parseLong(request.getParameter("cocheId"));
 		String nombre = request.getParameter("nombre");
+		
 		String email = request.getParameter("email");
+		Usuario usuario = Globales.DAO_USUARIO.obtenerPorEmail(email);
+		
 		LocalDateTime datetime = LocalDateTime.parse(request.getParameter("datetime"));
 		int numPersonas = Integer.parseInt(request.getParameter("numPersonas"));
 		String comentario = request.getParameter("comentario");
@@ -58,7 +62,7 @@ public class ReservaFormServlet extends HttpServlet {
 		
 		String accion = "";
 		
-		Reserva reserva = new Reserva(null, idCoche, nombre, email, datetime, numPersonas, comentario);
+		Reserva reserva = new Reserva(null, nombre, datetime, numPersonas, comentario, usuario.getId(), idCoche);
 		
 		if(reserva.getErrores().size() > 0) {
 			request.setAttribute("alertatexto", "No se ha podido realizar la reserva. Revise los datos.");
@@ -73,7 +77,7 @@ public class ReservaFormServlet extends HttpServlet {
 		try {
 			if(id == null || id.trim().length() == 0) {
 				Globales.DAO_RESERVA.insertar(reserva);
-				//Globales.DAO_COCHE.setTrueReserva(idCoche);
+				Globales.DAO_COCHE.setTrueReserva(idCoche);
 				accion = "realizada";
 			} else {
 				reserva.setId(Long.parseLong(id));

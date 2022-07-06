@@ -14,6 +14,10 @@ class DaoCocheMysql implements DaoCoche {
 	private static final String SQL_INSERT = "INSERT INTO coches (matricula, marca, modelo, color, potencia, cilindrada) VALUES (?, ?, ?, ?, ?, ?)";
 	private static final String SQL_UPDATE = "UPDATE coches SET matricula = ?, marca = ?, modelo = ?, color = ?, potencia = ?, cilindrada = ? WHERE id = ?";
 	private static final String SQL_DELETE = "DELETE FROM coches WHERE id = ?";
+	private static final String SQL_RESERVA_WHERE_ID_COCHE = "SELECT * FROM reservas WHERE coches_id = ?";
+	private static final String SQL_UPDATE_FALSE_RESERVA = "UPDATE coches SET reserva = ? WHERE id = ?";
+	private static final String SQL_UPDATE_TRUE_RESERVA = "UPDATE coches SET reserva = ? WHERE id = ?";
+	private static final String SQL_MATRICULA_EXIST = "SELECT matricula FROM coches WHERE matricula = ?";
 	
 	public DaoCocheMysql(String url, String user, String pass, String driver) {
 		this.url = url;
@@ -135,6 +139,8 @@ class DaoCocheMysql implements DaoCoche {
 				pst.setString(4, coche.getColor());
 				pst.setInt(5, coche.getPotencia());
 				pst.setInt(6, coche.getCilindrada());
+				
+				pst.setLong(7, coche.getId());
 
 				if(pst.executeUpdate() != 1) {
 					throw new DaoException("No se ha encontrado el usuario a modificar");
@@ -165,26 +171,88 @@ class DaoCocheMysql implements DaoCoche {
 
 	@Override
 	public boolean obtenerReservaPorId(Long id) {
-		// TODO Auto-generated method stub
-		return false;
+		
+		try (Connection con = DriverManager.getConnection(url, user, pass);
+				PreparedStatement pst = con.prepareStatement(SQL_RESERVA_WHERE_ID_COCHE);) {
+			pst.setLong(1, id);
+			
+			try (ResultSet rs = pst.executeQuery()) {
+				boolean respuesta = false;
+
+				if (rs.next()) {
+					if(rs.getLong("coches_id") == id) {
+							return true;		
+					}
+				}
+
+				return respuesta;
+			}
+		} catch (SQLException e) {
+			throw new DaoException("No se ha podido obtener el registro", e);
+		}
 	}
 
 	@Override
 	public void setFalseWhenNoReserva(Long id) {
-		// TODO Auto-generated method stub
+		
+		try (Connection con = DriverManager.getConnection(url, user, pass);
+				PreparedStatement pst = con.prepareStatement(SQL_UPDATE_FALSE_RESERVA);) {
+			
+				pst.setBoolean(1, false);
+				pst.setLong(2, id);
+
+				if(pst.executeUpdate() != 1) {
+					throw new DaoException("No se ha encontrado el usuario a modificar");
+				}
+				
+			} catch (SQLException e) {
+				throw new DaoException("No se ha podido modificar el registro", e);
+			}
 		
 	}
 
 	@Override
 	public void setTrueReserva(Long id) {
-		// TODO Auto-generated method stub
+		
+		try (Connection con = DriverManager.getConnection(url, user, pass);
+				PreparedStatement pst = con.prepareStatement(SQL_UPDATE_TRUE_RESERVA);) {
+			
+				pst.setBoolean(1, true);
+				pst.setLong(2, id);
+
+				if(pst.executeUpdate() != 1) {
+					throw new DaoException("No se ha encontrado el usuario a modificar");
+				}
+				
+			} catch (SQLException e) {
+				throw new DaoException("No se ha podido modificar el registro", e);
+			}
+		
 		
 	}
 
 	@Override
 	public boolean comprobarMatricula(String matricula) {
-		// TODO Auto-generated method stub
-		return false;
+		
+		try (Connection con = DriverManager.getConnection(url, user, pass);
+				PreparedStatement pst = con.prepareStatement(SQL_MATRICULA_EXIST);) {
+			pst.setString(1, matricula);
+			
+			try (ResultSet rs = pst.executeQuery()) {
+				boolean respuesta = false;
+
+				if (rs.next()) {
+					if(matricula == rs.getString("matricula")) {
+						respuesta = true;
+					}
+				}
+
+				return respuesta;
+			}
+		} catch (SQLException e) {
+			throw new DaoException("No se ha podido obtener el registro", e);
+		}
+
 	}
 
 

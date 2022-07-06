@@ -60,7 +60,7 @@
 						<c:if test="${sessionScope.usuario.rol == 'CLIENTE'}">
 							<td>
       							<div class="text-center">
-									<a href="admin/misReservas" type="button" class="btn btn-outline-primary">Mis Reservas</a>
+									<a href="admin/misReservas?id=${sessionScope.usuario.id}" type="button" class="btn btn-outline-primary">Mis Reservas</a>
 								</div>
       						</td>
 	  					</c:if>

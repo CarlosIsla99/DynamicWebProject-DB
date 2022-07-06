@@ -9,10 +9,11 @@ class DaoReservaMysql implements DaoReserva {
 	
 	private String url, user, pass;
 	
-	private static final String SQL_SELECT = "SELECT * FROM coches";
-	private static final String SQL_SELECT_ID = "SELECT * FROM coches WHERE id = ?";
-	private static final String SQL_INSERT = "INSERT INTO reservas (idcoche, nombre, email, fechahora, numeropersonas, comentario) VALUES (?, ?, ?, ?, ?, ?)";
-	private static final String SQL_UPDATE = "UPDATE reservas SET idcoche = ?, nombre = ?, email = ?, fechahora = ?, numeropersonas = ?, comentario = ?, usuarios_id = 0, coches_id = 0 WHERE id = ?";
+	private static final String SQL_SELECT = "SELECT * FROM reservas";
+	private static final String SQL_SELECT_ID = "SELECT * FROM reservas WHERE id = ?";
+	private static final String SQL_SELECT_COCHEID_BY_RESERVAID = "SELECT coches_id FROM reservas WHERE id = ?";
+	private static final String SQL_INSERT = "INSERT INTO reservas (nombre, fechahora, numeropersonas, comentario, usuarios_id, coches_id) VALUES (?, ?, ?, ?, ?, ?)";
+	private static final String SQL_UPDATE = "UPDATE reservas SET nombre = ?, fechahora = ?, numeropersonas = ?, comentario = ?, usuarios_id = ?, coches_id = ? WHERE id = ?";
 	private static final String SQL_DELETE = "DELETE FROM reservas WHERE id = ?";
 	
 	public DaoReservaMysql(String url, String user, String pass, String driver) {
@@ -44,7 +45,7 @@ class DaoReservaMysql implements DaoReserva {
 			ArrayList<Reserva> reservas = new ArrayList<Reserva>();
 			
 			while(rs.next()) {
-				reserva = new Reserva(rs.getLong("id"), rs.getLong("idcoche"), rs.getString("nombre"), rs.getString("email"), rs.getTimestamp("fechahora").toLocalDateTime(), rs.getInt("numeropersonas"), rs.getString("cilindrada"));
+				reserva = new Reserva(rs.getLong("id"), rs.getString("nombre"), rs.getTimestamp("fechahora").toLocalDateTime(), rs.getInt("numeropersonas"), rs.getString("comentario"), rs.getLong("usuarios_id"), rs.getLong("coches_id"));
 				reservas.add(reserva);
 			}
 					
@@ -52,7 +53,7 @@ class DaoReservaMysql implements DaoReserva {
 			
 			
 		} catch (SQLException e) {
-			throw new DaoException("No se ha encontrado ninguna reserva");
+			throw new DaoException("No se ha encontrado ninguna reserva" + e);
 		} finally {
 			
 			if(con != null) {
@@ -90,7 +91,7 @@ class DaoReservaMysql implements DaoReserva {
 				Reserva reserva = null;
 
 				if (rs.next()) {
-					reserva = new Reserva(rs.getLong("id"), rs.getLong("idcoche"), rs.getString("nombre"), rs.getString("email"), rs.getTimestamp("fechahora").toLocalDateTime(), rs.getInt("numeropersonas"), rs.getString("cilindrada"));
+					reserva = new Reserva(rs.getLong("id"), rs.getString("nombre"), rs.getTimestamp("fechahora").toLocalDateTime(), rs.getInt("numeropersonas"), rs.getString("comentario"), rs.getLong("usuarios_id"), rs.getLong("coches_id"));
 				}
 
 				return reserva;
@@ -106,13 +107,13 @@ class DaoReservaMysql implements DaoReserva {
 		try (Connection con = DriverManager.getConnection(url, user, pass);
 				PreparedStatement pst = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);) {
 			
-			pst.setLong(1, reserva.getIdCoche());
-			pst.setString(2, reserva.getNombre());
-			pst.setString(3, reserva.getEmail());
-			//pst.setString(4, (reserva.getFechaHora().toString()));
-			pst.setTimestamp(4, Timestamp.valueOf(reserva.getFechaHora()));
-			pst.setInt(5, reserva.getNumeroPersonas());
-			pst.setString(6, reserva.getComentario());
+			pst.setString(1, reserva.getNombre());
+			//pst.setString(2, (reserva.getFechaHora().toString()));
+			pst.setTimestamp(2, Timestamp.valueOf(reserva.getFechaHora()));
+			pst.setInt(3, reserva.getNumeroPersonas());
+			pst.setString(4, reserva.getComentario());
+			pst.setLong(5, reserva.getUsuarios_id());
+			pst.setLong(6, reserva.getCoches_id());
 
 			pst.executeUpdate();
 			
@@ -129,21 +130,67 @@ class DaoReservaMysql implements DaoReserva {
 	}
 
 	@Override
-	public void modificar(Reserva objeto) {
-		// TODO Auto-generated method stub
+	public void modificar(Reserva reserva) {
+		try (Connection con = DriverManager.getConnection(url, user, pass);
+				PreparedStatement pst = con.prepareStatement(SQL_UPDATE);) {
+				pst.setString(1, reserva.getNombre());
+				//pst.setString(4, (reserva.getFechaHora().toString()));
+				pst.setTimestamp(2, Timestamp.valueOf(reserva.getFechaHora()));
+				pst.setInt(3, reserva.getNumeroPersonas());
+				pst.setString(4, reserva.getComentario());
+				pst.setLong(5, reserva.getUsuarios_id());
+				pst.setLong(6, reserva.getCoches_id());
+				
+				pst.setLong(7, reserva.getId());
+
+				if(pst.executeUpdate() != 1) {
+					throw new DaoException("No se ha encontrado el usuario a modificar");
+				}
+				
+			} catch (SQLException e) {
+				throw new DaoException("No se ha podido modificar el registro", e);
+			}
 		
 	}
 
 	@Override
 	public void borrar(Long id) {
-		// TODO Auto-generated method stub
+		
+		try (Connection con = DriverManager.getConnection(url, user, pass);
+				PreparedStatement pst = con.prepareStatement(SQL_DELETE);) {
+			
+			pst.setLong(1, id);
+
+			if(pst.executeUpdate() != 1) {
+				throw new DaoException("No se ha encontrado el usuario a borrar");
+			}
+			
+		} catch (SQLException e) {
+			throw new DaoException("No se ha podido modificar el registro", e);
+		}
 		
 	}
 
 	@Override
-	public Long encontrarCochePorIdReserva(Long idResrva) {
-		// TODO Auto-generated method stub
-		return null;
+	public Long encontrarCochePorIdReserva(Long idReserva) {
+		
+		try (Connection con = DriverManager.getConnection(url, user, pass);
+				PreparedStatement pst = con.prepareStatement(SQL_SELECT_COCHEID_BY_RESERVAID);) {
+			pst.setLong(1, idReserva);
+			
+			try (ResultSet rs = pst.executeQuery()) {
+				Long coche_id = null;
+
+				if (rs.next()) {
+					coche_id = rs.getLong("coches_id");
+				}
+
+				return coche_id;
+			}
+		} catch (SQLException e) {
+			throw new DaoException("No se ha podido obtener el registro" + e);
+		}
+		
 	}
 
 

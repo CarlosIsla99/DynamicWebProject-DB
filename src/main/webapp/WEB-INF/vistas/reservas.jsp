@@ -17,12 +17,12 @@
   </thead>
   <tbody>
   	  <c:forEach items="${reservas}" var="reserva">
-  	  <c:if test="${sessionScope.usuario.email == reserva.email}">
+  	  <c:if test="${sessionScope.usuario.id == reserva.usuarios_id}">
     <tr>
       <td>${reserva.nombre}</td>
-      <td>${reserva.email}</td>
+      <td>${reserva.id}</td>
       <c:forEach items="${coches}" var="coche">
-      	<c:if test="${coche.id == reserva.idCoche}">
+      	<c:if test="${coche.id == reserva.coches_id}">
       		<td>${coche.marca} ${coche.modelo}</td>
       	</c:if>
       </c:forEach>
@@ -31,7 +31,7 @@
       <td>${reserva.comentario}</td>
 	  <td>
          <a href="admin/borrarReserva?id=${reserva.id}" type="button" class="btn btn-danger">Cancelar</a>
-         <a href="admin/reservaFormulario?id=${reserva.id}&idCoche=${reserva.idCoche}" type="button" class="btn btn-primary">Modificar</a>
+         <a href="admin/reservaFormulario?id=${reserva.id}&idCoche=${reserva.coches_id}" type="button" class="btn btn-primary">Modificar</a>
       </td>
     </tr>
     </c:if>

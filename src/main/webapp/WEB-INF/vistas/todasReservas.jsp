@@ -19,9 +19,13 @@
   <c:forEach items="${reservas}" var="reserva">
     <tr>
       <td>${reserva.nombre}</td>
-      <td>${reserva.email}</td>
+      <c:forEach items="${usuarios}" var="usuario">
+      <c:if test="${usuario.id == reserva.usuarios_id}">
+      		<td>${usuario.email}</td>
+      </c:if>
+      </c:forEach>
       <c:forEach items="${coches}" var="coche">
-      	<c:if test="${coche.id == reserva.idCoche}">
+      	<c:if test="${coche.id == reserva.coches_id}">
       		<td>${coche.marca} ${coche.modelo}</td>
       	</c:if>
       </c:forEach>

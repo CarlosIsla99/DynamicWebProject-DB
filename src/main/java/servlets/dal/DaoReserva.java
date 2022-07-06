@@ -4,5 +4,5 @@ import servlets.modelos.*;
 
 public interface DaoReserva extends Dao<Reserva> {
 
-	Long encontrarCochePorIdReserva(Long idResrva);
+	Long encontrarCochePorIdReserva(Long idReserva);
 }

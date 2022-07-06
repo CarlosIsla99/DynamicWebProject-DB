@@ -130,6 +130,7 @@ class DaoUsuarioMysql implements DaoUsuario {
 				pst.setString(1, usuario.getEmail());
 				pst.setString(2, usuario.getPassword());
 				pst.setString(3, usuario.getTelefono());
+				
 				pst.setLong(4, usuario.getId());
 
 				if(pst.executeUpdate() != 1) {
